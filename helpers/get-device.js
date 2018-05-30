@@ -39,7 +39,7 @@ const delayForDuration = duration => {
 const pingFrequency = 5000
 
 const startPing = (device, log) => {
-  device.state = Device.UNKNOWN
+  device.reachability = Device.UNKNOWN
   setInterval(() => {
     try {
       ping.sys.probe(device.host.address, active => {
@@ -48,12 +48,12 @@ const startPing = (device, log) => {
           log(`Broadlink RM device at ${device.host.address} (${device.host.macAddress || ''}) is no longer reachable.`)
 
           device.reachability = Device.INACTIVE
-        } else if (active && device.state !== 'active') {
-          if (device.state === Device.INACTIVE) {
+        } else if (active && device.reachability !== 'active') {
+          if (device.reachability === Device.INACTIVE) {
             log(`Broadlink RM device at ${device.host.address} (${device.host.macAddress || ''}) has been re-discovered.`)
           }
 
-          device.state = Device.ACTIVE
+          device.reachability = Device.ACTIVE
         }
         device.emit('reachability', Device.ACTIVE)
       })
