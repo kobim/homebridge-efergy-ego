@@ -5,7 +5,7 @@ const { _checksum } = require('./helpers')
 
 const CIPHER = 'aes-128-cbc'
 
-class Device {
+class Device extends EventEmitter {
   static get ACTIVE() {
     return 'active'
   }
@@ -19,14 +19,11 @@ class Device {
   }
 
   constructor(host, mac, name) {
+    super()
+
     this.host = host
     this.mac = mac
     this.name = name
-
-    this.emitter = new EventEmitter()
-    this.on = this.emitter.on
-    this.emit = this.emitter.emit
-    this.removeListener = this.emitter.removeListener
 
     this.count = Math.random() * 0xFFFF
     this.key = Buffer.from([0x09, 0x76, 0x28, 0x34, 0x3F, 0xE9, 0x9E, 0x23, 0x76, 0x5C, 0x15, 0x13, 0xAC, 0xCF, 0x8B, 0x02])
