@@ -141,13 +141,15 @@ class EGO extends Device {
     this.type = 'Efergy EGO'
     this.model = 'Outlet'
 
-    this.on('payload', payload => {
-      const param = payload[0]
-      if (param === 0x01) {
-        const power = payload[0x04]
-        this.emit('power', power === '1' || power === '3' || power === 1 || power === 3)
-      }
-    })
+    this.on('payload', this.onPayload.bind(this))
+  }
+
+  onPayload(payload) {
+    const param = payload[0]
+    if (param === 0x01) {
+      const power = payload[0x04]
+      this.emit('power', power === '1' || power === '3' || power === 1 || power === 3)
+    }
   }
 
   setPower(state) {

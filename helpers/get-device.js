@@ -96,7 +96,7 @@ const discoverDevices = (automatic = true, log, deviceDiscoveryTimeout = 60, add
     const macAddress = macAddressParts.join(':')
     device.host.macAddress = macAddress
 
-    log(`\u001B[35m[INFO]\u001B[0m Discovered ${device.model} (${device.type.toString(16)}) at ${device.host.address} (${device.host.macAddress})`)
+    log(`\u001B[35m[INFO]\u001B[0m Discovered ${device.model} (${device.getType()}) at ${device.host.address} (${device.host.macAddress})`)
     addDevice(device, addDeviceCb)
     startPing(device, log)
   })

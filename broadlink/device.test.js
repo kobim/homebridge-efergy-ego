@@ -57,7 +57,7 @@ describe('Device', () => {
     expect(device.iv).toEqual(FIRST_IV)
     expect(device.id).toEqual(Buffer.from([0, 0, 0, 0]))
 
-    expect(device.type).toBe(Device.UNKNOWN)
+    expect(device.getType()).toBe(Device.UNKNOWN)
     expect(device.reachability).toBe(Device.UNKNOWN)
     expect(device.model).toBe(Device.UNKNOWN)
   })
@@ -167,11 +167,25 @@ describe('Device', () => {
 
       expect(errFn).toHaveBeenCalledTimes(1)
     })
+    test('empty payload', () => {
+      const header = Buffer.alloc(0x38, 0)
+      header[0x26] = 0xEE // Command
+      const payload = Buffer.alloc(0x0, 0)
+
+      const errFn = jest.fn()
+      device.on('error', errFn)
+      device.cs.emit('message', Buffer.concat([header, enc(payload)]))
+
+      expect(errFn).toHaveBeenCalledTimes(0)
+    })
     test('on payload', done => {
-      expect.assertions(1)
+      expect.assertions(2)
 
       const header = Buffer.alloc(0x38, 0)
       header[0x26] = 0xEE // Command
+
+      const errFn = jest.fn()
+      device.on('error', errFn)
 
       const payload = Buffer.alloc(0x10, 0)
       payload.write('Hi', 0, 2)
@@ -182,6 +196,7 @@ describe('Device', () => {
       })
 
       device.cs.emit('message', Buffer.concat([header, enc(payload)]))
+      expect(errFn).toHaveBeenCalledTimes(0)
     })
   })
 
@@ -234,7 +249,18 @@ describe('Device', () => {
     })
   })
 
+  test('exit after 500ms', done => {
+    device.cs.on('close', () => {
+      device = null // So it won't be closed in the end
+      done()
+    })
+    device.exit()
+  })
+
   afterEach(done => {
+    if (!device) {
+      return done()
+    }
     device.exit(done)
   })
 })
@@ -295,7 +321,6 @@ describe('EGO', () => {
         expect(call).toEqual([false])
       })
     })
-
     test('checkPower', () => {
       device.sendPacket = jest.fn()
         .mockImplementationOnce((cmd, payload) => {
@@ -322,6 +347,18 @@ describe('EGO', () => {
 
     device.setPower(true)
     device.setPower(false)
+  })
+
+  test('unknown payload', () => {
+    const powerFn = jest.fn()
+    device.on('power', powerFn)
+
+    const payload = Buffer.alloc(0x10, 0)
+    payload[0x00] = 0xFF
+
+    device.emit('payload', payload)
+
+    expect(powerFn).toHaveBeenCalledTimes(0)
   })
 
   afterEach(done => {
