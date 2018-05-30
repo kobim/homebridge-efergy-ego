@@ -58,6 +58,7 @@ class Device extends EventEmitter {
       const command = response[0x26]
       const err = response[0x22] | (response[0x23] << 8)
       if (err !== 0) {
+        this.emit('error', err, payload)
         return
       }
 
