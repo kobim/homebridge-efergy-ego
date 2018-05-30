@@ -1,0 +1,33 @@
+{
+  "name": "homebridge-efergy-ego",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "xo"
+  },
+  "keywords": [
+    "homebridge-plugin",
+    "efergy",
+    "efergy ego"
+  ],
+  "engines": {
+    "node": ">=8.0.0",
+    "homebridge": ">=0.2.0"
+  },
+  "author": "Kobi Meirson <kobi@right.co.il>",
+  "license": "MIT",
+  "dependencies": {
+    "ping": "^0.2.2"
+  },
+  "devDependencies": {
+    "xo": "^0.21.1"
+  },
+  "xo": {
+    "space": 2,
+    "semicolon": false,
+    "rules": {
+      "object-curly-spacing": "off"
+    }
+  }
+}
