@@ -34,7 +34,8 @@ class Device {
     this.id = Buffer.alloc(0x04, 0)
 
     this.cs = dgram.createSocket({ type: 'udp4', reuseAddr: true })
-    this.type = 'unknown'
+    this.type = Device.UNKNOWN
+    this.model = Device.UNKNOWN
     this.reachability = Device.UNKNOWN
 
     this.setupSocket()
@@ -75,10 +76,10 @@ class Device {
     this.cs.bind()
   }
 
-  exit() {
+  exit(cb) {
     setTimeout(() => {
-      this.cs.close()
-    }, 500)
+      this.cs.close(cb)
+    }, cb ? 50 : 500)
   }
 
   getType() {
@@ -113,7 +114,7 @@ class Device {
     packet[0x28] = this.count & 0xFF
     packet[0x29] = this.count >> 8
     packet.write(this.mac, 0x2A, 6)
-    packet.write(this.id, 0x30, 4)
+    this.id.copy(packet, 0x30, 0, 0x04)
 
     const checksum = _checksum(payload)
     packet[0x34] = checksum & 0xFF

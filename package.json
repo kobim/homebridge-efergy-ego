@@ -34,9 +34,12 @@
       {
         "files": "**/*.test.js",
         "globals": [
+          "jest",
           "describe",
           "test",
-          "expect"
+          "expect",
+          "beforeEach",
+          "afterEach"
         ]
       }
     ]
