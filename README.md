@@ -3,27 +3,23 @@
 
 # Homebridge-Efergy-EGO
 
-Efergy EGO is a smart outlet which communicates over WiFi. This [homebridge](https://github.com/nfarina/homebridge/tree/master/lib) plugin allows control via HomeKit devices.
+Efergy EGO is a smart outlet which communicates over WiFi. This [homebridge](https://github.com/nfarina/homebridge) plugin allows control via HomeKit devices.
 
 ## Installation
 
-*Please make sure you use Node.js 8 or higher*
+**Please make sure you use Node.js 8 or higher**
 
 Install the plugin:
 ```npm install -g kobim/homebridge-efergy-ego```
 
-Add the platform to your config.json:
+Add the platform _EfergyEGO_ to your config.json:
 ```json
 {
-  "bridge": {
-    // ...
-  },
   "platforms": [
     {
       "platform": "EfergyEGO",
       "name": "EGO"
     }
-    // ...
   ]
 }
 ```
