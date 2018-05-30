@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "xo"
+    "test": "jest && xo"
   },
   "keywords": [
     "homebridge-plugin",
@@ -21,6 +21,7 @@
     "ping": "^0.2.2"
   },
   "devDependencies": {
+    "jest": "^23.0.1",
     "xo": "^0.21.1"
   },
   "xo": {
@@ -28,6 +29,16 @@
     "semicolon": false,
     "rules": {
       "object-curly-spacing": "off"
-    }
+    },
+    "overrides": [
+      {
+        "files": "**/*.test.js",
+        "globals": [
+          "describe",
+          "test",
+          "expect"
+        ]
+      }
+    ]
   }
 }
