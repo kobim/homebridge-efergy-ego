@@ -121,6 +121,52 @@ describe('Broadlink discovery', () => {
     broadlink.discover()
   })
 
+  test('deviceReady is emitted only once per MAC', done => {
+    expect.assertions(5)
+    const deviceMac = 'AA:BB:CC:EE:DD:12'
+    const deviceHost = '192.168.1.300'
+    const deviceName = 'Double!'
+    const macParts = deviceMac.split(':')
+
+    const egoDevice = Buffer.alloc(0x60, 0)
+    egoDevice[0x3A] = parseInt(macParts[5], 16)
+    egoDevice[0x3B] = parseInt(macParts[4], 16)
+    egoDevice[0x3C] = parseInt(macParts[3], 16)
+    egoDevice[0x3D] = parseInt(macParts[2], 16)
+    egoDevice[0x3E] = parseInt(macParts[1], 16)
+    egoDevice[0x3F] = parseInt(macParts[0], 16)
+    egoDevice[0x34] = 0x1D
+    egoDevice[0x35] = 0x27
+    egoDevice.write(deviceName, 0x40)
+
+    const deviceAuthOriginal = Device.prototype.auth
+    const deviceAuthMock = jest.fn().mockImplementationOnce(function () {
+      Device.prototype.auth = deviceAuthOriginal
+      this.emit('deviceReady')
+    })
+    Device.prototype.auth = deviceAuthMock
+
+    const broadlink = new Broadlink()
+    const deviceReady = jest.fn().mockImplementation(device => {
+      expect(device.getType()).toBe('Efergy EGO')
+      const macAddressParts = device.mac.toString('hex').match(/[\s\S]{1,2}/g) || []
+      const macAddress = macAddressParts.join(':').toUpperCase()
+      expect(macAddress).toBe(deviceMac)
+      expect(device.name).toBe(deviceName)
+      expect(device.host).toBe(deviceHost)
+      device.cs.close(() => {
+        setTimeout(done, 500)
+      })
+    })
+    broadlink.on('deviceReady', deviceReady)
+    mockSendto.mockImplementationOnce(function () {
+      this.emit('message', egoDevice, deviceHost)
+      this.emit('message', egoDevice, deviceHost)
+      expect(deviceReady).toHaveBeenCalledTimes(1)
+    })
+    broadlink.discover()
+  })
+
   test('deviceReady isn\'t emitted for unknown device', done => {
     expect.assertions(1)
     const deviceHost = '192.168.1.200'
