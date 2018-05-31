@@ -1,6 +1,6 @@
 {
   "name": "homebridge-efergy-ego",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Efergy EGO plugin for homebridge",
   "main": "index.js",
   "scripts": {
