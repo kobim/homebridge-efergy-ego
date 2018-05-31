@@ -98,6 +98,7 @@ class Broadlink extends EventEmitter {
         if (device) {
           this.devices[mac] = device
           device.on('deviceReady', () => this.emit('deviceReady', device))
+          device.on('error', err => console.error(err))
           device.auth()
         }
       }

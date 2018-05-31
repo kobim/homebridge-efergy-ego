@@ -1,7 +1,7 @@
 {
   "name": "homebridge-efergy-ego",
   "version": "1.0.0",
-  "description": "",
+  "description": "Efergy EGO plugin for homebridge",
   "main": "index.js",
   "scripts": {
     "test": "jest --coverage && xo"

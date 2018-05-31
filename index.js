@@ -1,5 +1,5 @@
 const { discoverDevices } = require('./helpers/get-device')
-const Device = require('./broadlink/device')
+const { Device } = require('./broadlink/device')
 
 let Accessory
 let Service
@@ -23,7 +23,6 @@ class EfergyEGO {
   }
 
   addDevice(device) {
-    this.log('Discovered', device)
     const uuid = UUIDGen.generate(device.host.macAddress)
     let accessory
     let isNew = false
@@ -89,7 +88,7 @@ class EfergyEGO {
         if (!accessoryDevice || !accessory.reachable) {
           return cb('Unreachable')
         }
-        accessoryDevice.set_power(value)
+        accessoryDevice.setPower(value)
         return cb()
       })
       .on('get', cb => {

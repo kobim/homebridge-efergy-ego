@@ -119,14 +119,7 @@ class Device extends EventEmitter {
     packet[0x35] = checksum >> 8
 
     const cipher = createCipheriv(CIPHER, this.key, this.iv)
-    const concat = [packet]
-    concat.push(cipher.update(payload))
-    const final = cipher.final()
-    if (final) {
-      concat.push(final)
-    }
-
-    packet = Buffer.concat(concat)
+    packet = Buffer.concat([packet, cipher.update(payload)])
     const allChecksum = _checksum(packet)
     packet[0x20] = allChecksum & 0xFF
     packet[0x21] = allChecksum >> 8
