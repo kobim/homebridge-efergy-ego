@@ -39,9 +39,9 @@ class EfergyEGO {
       accessory = new Accessory(device.name, uuid, 7) // Accessory.Categories.OUTLET = 7
       accessory.addService(Service.Outlet, device.name)
     }
-    accessory.updateReachability(true)
+    accessory.reachable = true
     device.on('reachability', reachability => {
-      accessory.updateReachability(reachability === Device.ACTIVE)
+      accessory.reachable = reachability === Device.ACTIVE
     })
     device.on('power', power => {
       // If power has been changed remotely
@@ -62,7 +62,7 @@ class EfergyEGO {
   configureAccessory(accessory) {
     this.log('Configuring accessory', accessory)
     this.devices.push(accessory)
-    accessory.updateReachability(false)
+    accessory.reachable = false
     this.prepareAccessory(accessory)
   }
 
@@ -97,7 +97,9 @@ class EfergyEGO {
         if (!accessoryDevice || !accessory.reachable) {
           return cb('Unreachable')
         }
-        accessoryDevice.once('power', cb)
+        accessoryDevice.once('power', (power) => {
+          cb(null, power)
+        })
       })
     accessory.configured = true
   }
