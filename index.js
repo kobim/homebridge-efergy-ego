@@ -17,86 +17,89 @@ class EfergyEGO {
     this.homebridge.on('didFinishLaunching', this.discover.bind(this))
   }
 
-  accessories(callback) {
-    this.log('yeah')
-    callback(this.devices)
-  }
-
   discover() {
     this.log('Discovery started')
-    discoverDevices(true, this.log, this.config.deviceDiscoveryTimeout, this.addDevice.bind(this))
+    discoverDevices(this.log, this.addDevice.bind(this), true, this.config.deviceDiscoveryTimeout)
   }
 
   addDevice(device) {
     this.log('Discovered', device)
-    const accessoryName = device.name
-    const uuid = UUIDGen.generate(accessoryName)
+    const uuid = UUIDGen.generate(device.host.macAddress)
     let accessory
     let isNew = false
 
     for (let i = 0; i < this.devices.length; i++) {
       if (this.devices[i].UUID === uuid) {
         accessory = this.devices[i]
-        this.log('Skipping the discovery of', accessoryName)
+        this.log(`Attaching the device to an existing accessory: ${accessory.displayName}`)
       }
     }
     if (!accessory) {
       isNew = true
-      accessory = new Accessory(accessoryName, uuid)
+      accessory = new Accessory(device.name, uuid, 7) // Accessory.Categories.OUTLET = 7
       accessory.addService(Service.Outlet, device.name)
     }
-    accessory.reachable = true
-    accessory.on('identify', (paired, callback) => {
-      this.log(accessory.displayName, 'Identify!!!')
-      callback()
-    })
-    const service = accessory.getService(Service.Outlet)
-    let fromSet = false
-    service.getCharacteristic(Characteristic.On)
-      // .removeAllListeners('get').on('get', () => {
-      //   console.log('woo hoo', arguments)
-      //   if (!accessory.reachable) {
-      //     return cb('Not reachable')
-      //   }
-      //   cb(true);
-      // })
-      .removeAllListeners('set').on('set', (value, cb) => {
-        if (!accessory.reachable) {
-          return cb('Not reachable')
-        }
-        if (!fromSet) {
-          device.set_power(value)
-        }
-        fromSet = false
-        cb()
-      })
-    device.on('power', power => {
-      fromSet = true
-      service.setCharacteristic(Characteristic.On, power)
-    })
+    accessory.updateReachability(true)
     device.on('reachability', reachability => {
-      accessory.reachable = reachability === Device.ACTIVE
+      accessory.updateReachability(reachability === Device.ACTIVE)
     })
+    device.on('power', power => {
+      // If power has been changed remotely
+      accessory.getService(Service.Outlet)
+        .getCharacteristic(Characteristic.On)
+        .updateValue(power)
+    })
+
+    this.prepareAccessory(accessory, device)
 
     if (isNew) {
       this.devices.push(accessory)
       this.homebridge.registerPlatformAccessories('homebridge-efergy-ego', 'EfergyEGO', [accessory])
-      this.log('Added new accessory:', accessoryName)
+      this.log('Added new accessory:', accessory.displayName)
     }
   }
 
   configureAccessory(accessory) {
-    this.log('config accessory', accessory)
+    this.log('Configuring accessory', accessory)
     this.devices.push(accessory)
-    accessory.reachable = false
+    accessory.updateReachability(false)
+    this.prepareAccessory(accessory)
+  }
+
+  prepareAccessory(accessory, device) {
+    if (accessory.device) {
+      this.log('Attempted to attach a device to an accessory with attached device!')
+      return
+    }
+    accessory.device = device
+
+    if (accessory.configured) {
+      return
+    }
+
+    accessory.on('identify', (paired, callback) => {
+      this.log(`${accessory.displayName} identified!`)
+      callback()
+    })
+
     const service = accessory.getService(Service.Outlet)
     service.getCharacteristic(Characteristic.On)
-      // .on('get', () => {
-      //   return cb('Not reachable')
-      // })
       .on('set', (value, cb) => {
-        return cb('Not reachable')
+        const accessoryDevice = accessory.device
+        if (!accessoryDevice || !accessory.reachable) {
+          return cb('Unreachable')
+        }
+        accessoryDevice.set_power(value)
+        return cb()
       })
+      .on('get', cb => {
+        const accessoryDevice = accessory.device
+        if (!accessoryDevice || !accessory.reachable) {
+          return cb('Unreachable')
+        }
+        accessoryDevice.once('power', cb)
+      })
+    accessory.configured = true
   }
 }
 

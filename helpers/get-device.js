@@ -43,19 +43,21 @@ const startPing = (device, log) => {
   setInterval(() => {
     try {
       ping.sys.probe(device.host.address, active => {
-        device.check_power() // Will sync the state
         if (!active && device.reachability === Device.ACTIVE) {
-          log(`Broadlink RM device at ${device.host.address} (${device.host.macAddress || ''}) is no longer reachable.`)
+          log(`\u001B[35m[INFO]\u001B[0m Efergy EGO device at ${device.host.address} (${device.host.macAddress}) is no longer reachable.`)
 
           device.reachability = Device.INACTIVE
         } else if (active && device.reachability !== 'active') {
           if (device.reachability === Device.INACTIVE) {
-            log(`Broadlink RM device at ${device.host.address} (${device.host.macAddress || ''}) has been re-discovered.`)
+            log(`\u001B[35m[INFO]\u001B[0m Efergy EGO device at ${device.host.address} (${device.host.macAddress}) has been re-discovered.`)
           }
 
           device.reachability = Device.ACTIVE
         }
-        device.emit('reachability', Device.ACTIVE)
+        device.emit('reachability', device.reachability)
+        if (active) {
+          device.check_power() // Sync the device state
+        }
       })
     } catch (err) {}
   }, pingFrequency)
@@ -65,20 +67,20 @@ const discoveredDevices = {}
 let discoverDevicesInterval
 
 const addDevice = (device, cb) => {
-  if (!device.isUnitTestDevice && (discoveredDevices[device.host.address] || discoveredDevices[device.host.macAddress])) {
+  if (!device.isUnitTestDevice && discoveredDevices[device.host.macAddress]) {
     return
   }
 
   const isNew = discoveredDevices[device.host.macAddress] === undefined
 
-  discoveredDevices[device.host.address] = device
   discoveredDevices[device.host.macAddress] = device
+
   if (isNew && cb) {
     cb(device)
   }
 }
 
-const discoverDevices = (automatic = true, log, deviceDiscoveryTimeout = 60, addDeviceCb = undefined) => {
+const discoverDevices = (log, addDeviceCb, automatic = true, deviceDiscoveryTimeout = 60) => {
   if (automatic) {
     discoverDevicesInterval = setInterval(() => {
       broadlink.discover()
@@ -93,7 +95,7 @@ const discoverDevices = (automatic = true, log, deviceDiscoveryTimeout = 60, add
 
   broadlink.on('deviceReady', device => {
     const macAddressParts = device.mac.toString('hex').match(/[\s\S]{1,2}/g) || []
-    const macAddress = macAddressParts.join(':')
+    const macAddress = macAddressParts.join(':').toUpperCase()
     device.host.macAddress = macAddress
 
     log(`\u001B[35m[INFO]\u001B[0m Discovered ${device.model} (${device.getType()}) at ${device.host.address} (${device.host.macAddress})`)
