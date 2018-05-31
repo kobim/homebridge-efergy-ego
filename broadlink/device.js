@@ -111,7 +111,7 @@ class Device extends EventEmitter {
     packet[0x26] = command
     packet[0x28] = this.count & 0xFF
     packet[0x29] = this.count >> 8
-    packet.write(this.mac, 0x2A, 6)
+    this.mac.copy(packet, 0x2A, 0, 0x06)
     this.id.copy(packet, 0x30, 0, 0x04)
 
     const checksum = _checksum(payload)

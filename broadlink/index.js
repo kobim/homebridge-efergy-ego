@@ -107,6 +107,7 @@ class Broadlink extends EventEmitter {
     setTimeout(() => {
       cs.close()
     }, 300)
+    return cs
   }
 }
 

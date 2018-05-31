@@ -32,7 +32,7 @@ describe('Device', () => {
     address: '127.0.0.1',
     port: 1234
   }
-  const mac = 'aa:bb:cc:dd:ee:ff'
+  const mac = Buffer.from([0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF])
   const name = 'Test Device'
 
   const gen = length => {

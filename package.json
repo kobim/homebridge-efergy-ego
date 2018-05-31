@@ -40,7 +40,9 @@
           "test",
           "expect",
           "beforeEach",
-          "afterEach"
+          "afterEach",
+          "beforeAll",
+          "afterAll"
         ]
       }
     ]
