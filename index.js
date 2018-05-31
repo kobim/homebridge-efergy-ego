@@ -97,7 +97,7 @@ class EfergyEGO {
         if (!accessoryDevice || !accessory.reachable) {
           return cb('Unreachable')
         }
-        accessoryDevice.once('power', (power) => {
+        accessoryDevice.once('power', power => {
           cb(null, power)
         })
       })
