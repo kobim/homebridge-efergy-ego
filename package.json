@@ -1,6 +1,6 @@
 {
   "name": "homebridge-efergy-ego",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Efergy EGO plugin for homebridge",
   "main": "index.js",
   "scripts": {
@@ -18,7 +18,7 @@
   "author": "Kobi Meirson <kobi@right.co.il>",
   "license": "MIT",
   "dependencies": {
-    "ping": "^0.2.2"
+    "ping": "^0.4.1"
   },
   "devDependencies": {
     "coveralls": "^3.1.0",
