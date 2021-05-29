@@ -21,9 +21,9 @@
     "ping": "^0.2.2"
   },
   "devDependencies": {
-    "coveralls": "^3.0.1",
-    "jest": "^23.0.1",
-    "xo": "^0.21.1"
+    "coveralls": "^3.1.0",
+    "jest": "^27.0.1",
+    "xo": "^0.40.1"
   },
   "xo": {
     "space": 2,
