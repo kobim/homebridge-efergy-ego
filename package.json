@@ -4,7 +4,7 @@
   "description": "Efergy EGO plugin for homebridge",
   "main": "index.js",
   "scripts": {
-    "test": "jest --coverage && xo"
+    "test": "jest --coverage"
   },
   "keywords": [
     "homebridge-plugin",
@@ -21,30 +21,6 @@
     "ping": "^0.4.1"
   },
   "devDependencies": {
-    "coveralls": "^3.1.0",
-    "jest": "^27.0.1",
-    "xo": "^0.40.1"
-  },
-  "xo": {
-    "space": 2,
-    "semicolon": false,
-    "rules": {
-      "object-curly-spacing": "off"
-    },
-    "overrides": [
-      {
-        "files": "**/*.test.js",
-        "globals": [
-          "jest",
-          "describe",
-          "test",
-          "expect",
-          "beforeEach",
-          "afterEach",
-          "beforeAll",
-          "afterAll"
-        ]
-      }
-    ]
+    "jest": "^27.0.1"
   }
 }
